@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/tours-75/static/css/main.2f958013.css",
-    "main.js": "/tours-75/static/js/main.6f0d2cff.js",
+    "main.css": "/tours-75/static/css/main.e61c35b9.css",
+    "main.js": "/tours-75/static/js/main.6d1a6092.js",
     "index.html": "/tours-75/index.html",
-    "main.2f958013.css.map": "/tours-75/static/css/main.2f958013.css.map",
-    "main.6f0d2cff.js.map": "/tours-75/static/js/main.6f0d2cff.js.map"
+    "main.e61c35b9.css.map": "/tours-75/static/css/main.e61c35b9.css.map",
+    "main.6d1a6092.js.map": "/tours-75/static/js/main.6d1a6092.js.map"
   },
   "entrypoints": [
-    "static/css/main.2f958013.css",
-    "static/js/main.6f0d2cff.js"
+    "static/css/main.e61c35b9.css",
+    "static/js/main.6d1a6092.js"
   ]
 }
