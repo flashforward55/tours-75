@@ -8,22 +8,22 @@ import Footer from 'components/footer';
 // Vanila css
 // import './App.css';
 
-import style from './App.module.css';
+//import style from './App.module.css';
 
 const App = () => {
-	return (
-		<div className='app-container'>
-			<ThemeProvider>
-				<Header />
+  return (
+    <div className="app-container">
+      <ThemeProvider>
+        <Header />
 
-				<Routes>
-					<Route path='/' element={<Tours />} />
-					<Route path='/foo' element={<></>} />
-				</Routes>
-				<Footer />
-			</ThemeProvider>
-		</div>
-	);
+        <Routes>
+          <Route path="/" element={<Tours />} />
+          <Route path="/foo" element={<></>} />
+        </Routes>
+        <Footer />
+      </ThemeProvider>
+    </div>
+  );
 };
 
 export default App;
