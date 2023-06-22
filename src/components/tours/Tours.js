@@ -1,122 +1,78 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import TourFormModal from 'components/tour-form-modal/TourFormModal';
-import ToursItem from 'components/tours-item/ToursItems';
-import debounce from 'lodash.debounce';
-import { addTour, fetchTours } from 'api/tours';
-import useToggle from 'hooks/useToggle';
+import ToursItem from '../tours-item';
+import clsx from 'clsx';
+import './Tours.scss';
+import { DARK, LIGHT } from 'constans';
 
-const ToursHooks = () => {
-  const { visible, open, close } = useToggle(false);
+const toursArray = [
+	{
+		id: 1,
+		name: 'Portugalia vibe',
+		price: 3000,
+		continent: 'Europe',
+		description: 'Best tour for discover Portugal',
+	},
+	{
+		id: 2,
+		name: 'The breath of Italy',
+		price: 5000,
+		continent: 'Europe',
+		// description: 'Best tour for discover Italia',
+	},
+	{
+		id: 3,
+		name: 'Spanish bullfight',
+		price: 1000,
+		continent: 'Europe',
+		description: 'A new experience from watching a bullfight',
+	},
+	{
+		id: 4,
+		name: 'Germany race',
+		price: 15000,
+		continent: 'Europe',
+		// description: 'A quick walk on the German autobahns',
+	},
+	{
+		id: 5,
+		name: 'Indian traditions',
+		price: 123,
+		continent: 'Asia',
+		// description: 'Best tour for discover Asia',
+	},
+];
 
-  const [isLoading,] = useState(false);
+const Tours = ({ theme }) => {
+	// const getTheme = (value) => {
+	// 	if (value === DARK) {
+	// 		return {
+	// 			background: '#000',
+	// 			color: '#fff',
+	// 		};
+	// 	}
+	// 	if (value === LIGHT) {
+	// 		return {
+	// 			background: '#fff',
+	// 			color: '#000',
+	// 		};
+	// 	}
+	// };
+	return (
+		<div
+			className={clsx('tours-container', {
+				dark: theme === DARK,
+				light: theme === LIGHT,
+			})}
+			// style={getTheme(theme)}
+		>
+			<h1>Tours page</h1>
 
-  const [query, setQuery] = useState('');
-  const [errorMessage,] = useState('');
-
-  const [toursData, setToursData] = useState({
-    total_items: 0,
-    items: [],
-  });
-
-  // Prevent request on first render
-
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-
-    const loadTours = async () => {
-      const data = await fetchTours(query);
-      setToursData(data);
-    };
-
-    loadTours();
-  }, [query]);
-
-  const loadTours = useCallback(async () => {
-    const data = await fetchTours(query);
-    setToursData(data);
-  }, [query]);
-
-  // componentDidMount + componentDidUpdate
-
-  useEffect(() => {
-    const load = async () => {
-      const data = await fetchTours(query);
-      setToursData(data);
-    };
-    load();
-  }, [query]);
-
-  // componentWillUnmount
-
-  useEffect(() => () => console.log('componentWillUnmount'), []);
-
-  const handleChangeQuery = debounce((e) => {
-    setQuery(e.target.value);
-  }, 1000);
-
-  const handleAddNewTour = async (tour) => {
-    await addTour(tour);
-    loadTours();
-  };
-
-  const filteredItemsCached = useMemo(
-    () =>
-      toursData.items.filter((el) => {
-        return el.name.toLowerCase().includes(query.toLowerCase());
-      }),
-    [toursData.items, query]
-  );
-
-  return (
-    <>
-      <TourFormModal visible={visible} onClose={close} onAddTour={handleAddNewTour} />
-
-      <div className='tours-container'>
-        <div className='tours-container__controlls'>
-          <h1>Tours page</h1>
-          <input
-            id='search-input'
-            type='text'
-            placeholder='search...'
-            onChange={handleChangeQuery}
-          />
-          <button onClick={open}>Add tour</button>
-        </div>
-
-        {isLoading ? (
-          <div>loading...</div>
-        ) : (
-          <>
-            {errorMessage ? (
-              <p>{errorMessage}</p>
-            ) : (
-              <>
-                {/* {!!toursData.total_items && ( */}
-                <div>
-                  <p>Total items:{toursData.total_items}</p>
-                  <ul className='tours-list'>
-                    {filteredItemsCached.map((tour) => (
-                      <ToursItem
-                        {...tour}
-                        key={tour.id}
-                      // onDelete={this.handleRemoveTour}
-                      />
-                    ))}
-                  </ul>
-                </div>
-                {/* )} */}
-              </>
-            )}
-          </>
-        )}
-      </div>
-    </>
-  );
+			<ul className='tours-list'>
+				{toursArray.map((tour) => (
+					<ToursItem key={tour.id} {...tour} theme={theme} />
+				))}
+			</ul>
+		</div>
+	);
 };
 
-export default ToursHooks;
+export default Tours;
