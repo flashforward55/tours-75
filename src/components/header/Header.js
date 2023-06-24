@@ -1,29 +1,25 @@
-//import { useEffect, useState } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { useThemeContext } from 'hooks/useTheme';
 import './Header.css';
 
-const Header = ({ theme, onChangeTheme }) => {
-  // componentDidMount
+const Header = () => {
+	const { theme, onChangeTheme } = useThemeContext();
+	const inputRef = useRef(null);
 
-  // useEffect(() => {
-  // 	console.log('work useEffect');
-  // }, []);
+	return (
+		<header
+			style={{
+				display: 'flex',
+				justifyContent: 'space-between',
+				alignItems: 'center',
+			}}>
+			<p ref={inputRef}>logo</p>
+			<Link to='/foo'>go to</Link>
 
-  // console.log('render', toggle);
-
-  return (
-    <header
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
-      <p>logo</p>
-      <Link to='/foo'>go to</Link>
-
-      <button onClick={onChangeTheme}>Current Theme:{theme}</button>
-    </header>
-  );
+			<button onClick={onChangeTheme}>Current Theme:{theme}</button>
+		</header>
+	);
 };
 
 export default Header;

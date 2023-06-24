@@ -1,43 +1,29 @@
-import Header from 'components/header';
-//import Tours from 'components/tours';
-import Footer from 'components/footer';
+import { Route, Routes } from 'react-router-dom';
 
-import { DARK, LIGHT } from 'constans';
+import ThemeProvider from 'hooks/useTheme';
+import Header from 'components/header';
+import Tours from 'components/tours';
+import Footer from 'components/footer';
 
 // Vanila css
 // import './App.css';
 
-//import style from './App.module.css';
-import { Component } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import ToursHooks from 'components/tours/ToursHooks';
+import style from './App.module.css';
 
-class App extends Component {
-  state = {
-    theme: LIGHT,
-  };
+const App = () => {
+	return (
+		<div className='app-container'>
+			<ThemeProvider>
+				<Header />
 
-  handleChangeTheme = () => {
-    this.setState(prevState => ({
-      theme: prevState.theme === DARK ? LIGHT : DARK,
-    }));
-  };
-
-  render() {
-    const { theme } = this.state;
-    return (
-      <div className="app-container">
-        <Header theme={theme} onChangeTheme={this.handleChangeTheme} />
-
-        <Routes>
-          <Route path="/" element={<ToursHooks theme={theme} />} />
-          <Route path="/foo" element={<></>} />
-        </Routes>
-
-        <Footer />
-      </div>
-    );
-  }
-}
+				<Routes>
+					<Route path='/' element={<Tours />} />
+					<Route path='/foo' element={<></>} />
+				</Routes>
+				<Footer />
+			</ThemeProvider>
+		</div>
+	);
+};
 
 export default App;
