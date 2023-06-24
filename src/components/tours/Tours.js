@@ -5,133 +5,140 @@ import { DARK, LIGHT } from 'constans';
 import { Component } from 'react';
 import debounce from 'lodash.debounce';
 import TourFormModal from 'components/tour-form-modal/TourFormModal';
-import { fetchFilteredTours, fetchTours } from 'helpers';
+import { addTour, fetchTours, removeTour } from 'api/tours';
 
 const initialState = {
-  visible: false,
-  query: '',
-  total_items: 0,
-  items: [],
-  isLoading: false,
+	visible: false,
+	query: '',
+	total_items: 0,
+	items: [],
+	isLoading: false,
+	errorMessage: '',
 };
 
 class Tours extends Component {
-  state = initialState;
+	state = initialState;
 
-  async componentDidMount() {
-    this.setState({ isLoading: true });
+	handleFetchTours = async (query, shoudShowLoader = false) => {
+		try {
+			if (shoudShowLoader) {
+				this.setState({ isLoading: true });
+			}
 
-    await fetchTours();
+			const { total_items, items } = await fetchTours(query);
+			this.setState({
+				total_items,
+				items,
+			});
+		} catch (err) {
+			this.setState({ errorMessage: err.toString() });
+		} finally {
+			if (shoudShowLoader) {
+				this.setState({ isLoading: false });
+			}
+		}
+	};
 
-    this.setState({ isLoading: false });
+	async componentDidMount() {
+		this.handleFetchTours(null, true);
+	}
 
-    const { total_items, items } = await fetchTours();
+	async componentDidUpdate(prevProps, prevState) {
+		if (prevState.query !== this.state.query) {
+			this.handleFetchTours(this.state.query);
+		}
+	}
 
-    this.setState({
-      isLoading: false,
-      total_items,
-      items,
-    });
-  }
+	handleChangeQuery = (event) => {
+		this.setState({ query: event.target.value });
+	};
 
-  shouldComponentUpdate(_, nextState) {
-    if (this.state.isLoading && !nextState.isLoading && this.state.total_items === 0) {
-      return false;
-    }
-    return true;
-  }
+	onOpenModal = () => {
+		this.setState({ visible: true });
+	};
 
-  async componentDidUpdate(prevProps, prevState) {
-    console.log('work');
-    if (prevState.query !== this.state.query) {
-      this.setState({ isLoading: true });
-      const { total_items, items } = await fetchFilteredTours(this.state.query);
-      this.setState({
-        isLoading: false,
-        total_items,
-        items,
-      });
-    }
-  }
+	onCloseModal = () => {
+		this.setState({ visible: false });
+	};
 
-  handleChangeQuery = (event) => {
-    this.setState({ query: event.target.value });
-  };
+	handleAddNewTour = async (tour) => {
+		try {
+			await addTour(tour);
+			this.handleFetchTours();
+		} catch (err) {
+			this.setState({ errorMessage: err.toString() });
+		}
+	};
 
-  onOpenModal = () => {
-    this.setState({ visible: true });
-  };
+	handleRemoveTour = async (tourId) => {
+		try {
+			await removeTour(tourId);
+			this.handleFetchTours();
+		} catch (err) {
+			this.setState({ errorMessage: err.toString() });
+		}
+	};
 
-  onCloseModal = () => {
-    this.setState({ visible: false });
-  };
+	render() {
+		const { theme } = this.props;
+		const { visible, total_items, items, isLoading, errorMessage } = this.state;
+		return (
+			<>
+				<TourFormModal
+					visible={visible}
+					onClose={this.onCloseModal}
+					onAddTour={this.handleAddNewTour}
+				/>
 
-  addNewTour = (tour) => {
-    this.setState((prevState) => ({ items: [...prevState.items, tour] }));
-  };
+				<div
+					className={clsx('tours-container', {
+						dark: theme === DARK,
+						light: theme === LIGHT,
+					})}
+					// style={getTheme(theme)}
+				>
+					<div className='tours-container__controlls'>
+						<h1>Tours page</h1>
+						<input
+							id='search-input'
+							type='text'
+							placeholder='search...'
+							onChange={debounce(this.handleChangeQuery, 1000)}
+						/>
+						<button onClick={this.onOpenModal}>Add tour</button>
+					</div>
 
-  // handleFilterQuery = () => {
-  // 	const items = toursArray.filter(
-  // 		(el) =>
-  // 			el.name.toLowerCase().includes(this.state.query.toLowerCase()) &&
-  // 			el.continent.toLowerCase().includes(this.state.query.toLowerCase())
-  // 	);
-  // 	this.setState({ items });
-  // };
-
-  componentWillUnmount() {
-    console.log('componentWillUnmount');
-  }
-
-  render() {
-    const { theme } = this.props;
-    const { visible, total_items, items, isLoading } = this.state;
-    // console.log(this.state);
-    return (
-      <>
-        <TourFormModal visible={visible} onClose={this.onCloseModal} onAddTour={this.addNewTour} />
-
-        <div
-          className={clsx('tours-container', {
-            dark: theme === DARK,
-            light: theme === LIGHT,
-          })}
-        // style={getTheme(theme)}
-        >
-          <div className='tours-container__controlls'>
-            <h1>Tours page</h1>
-            <input
-              id='search-input'
-              type='text'
-              placeholder='search...'
-              onChange={debounce(this.handleChangeQuery, 1000)}
-            />
-            {/* <button onClick={this.handleFilterQuery}>Search</button> */}
-            <button onClick={this.onOpenModal}>Add tour</button>
-          </div>
-
-          {isLoading ? (
-            <div>loading...</div>
-          ) : (
-            <>
-              {total_items && (
-                <div>
-                  <p>Total items:{total_items}</p>
-                  <ul className='tours-list'>
-                    {items
-                      // .filter((el) => el.name.toLowerCase().includes(query.toLowerCase()))
-                      .map((tour) => (
-                        <ToursItem key={tour.id} {...tour} theme={theme} />
-                      ))}
-                  </ul>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </>
-    );
-  }
+					{isLoading ? (
+						<div>loading...</div>
+					) : (
+						<>
+							{errorMessage ? (
+								<p>{errorMessage}</p>
+							) : (
+								<>
+									{total_items && (
+										<div>
+											<p>Total items:{total_items}</p>
+											<ul className='tours-list'>
+												{items.map((tour) => (
+													<ToursItem
+														{...tour}
+														key={tour.id}
+														theme={theme}
+														onDelete={this.handleRemoveTour}
+													/>
+												))}
+											</ul>
+										</div>
+									)}
+								</>
+							)}
+						</>
+					)}
+				</div>
+			</>
+		);
+	}
 }
 
 export default Tours;
