@@ -7,7 +7,7 @@ import { DARK, LIGHT } from 'constans';
 // Vanila css
 // import './App.css';
 
-import style from './App.module.css';
+//import style from './App.module.css';
 import { Component } from 'react';
 import { Route, Routes } from 'react-router-dom';
 
